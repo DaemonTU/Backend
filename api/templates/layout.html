@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Daemon</title>
+        <meta charset="UTF-8">
+        <meta name="author" content="Daemon | Tezpur University">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="../static/assets/daemon_favicon.PNG">
+        <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+        <link href="../static/css/addMembers.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <header>
+          <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
+            <a class="flex items-center mb-4 md:mb-0" href="/admin/member">
+              <div class="navbar-brand" style="width: 40%;
+              font-family: 'Oswald', sans-serif;
+              font-size: 30px;
+              color: #6b6b6b;">DAEMON</div>
+            </a>
+            <nav class="md:ml-auto flex flex-wrap items-center text-base justify-center">
+              <a class="mr-5 navbar-links" style="color:  #ff0000da;
+              font-family: 'Oswald', sans-serif;
+              font-size: 18px;" href="/admin/">Create Admin</a>
+              <a class="mr-5 navbar-links" style="color:  #ff0000da;
+              font-family: 'Oswald', sans-serif;
+              font-size: 18px;" href="/admin/member">Add Member</a>
+              <a class="mr-5 navbar-links" style="color:  #ff0000da;
+              font-family: 'Oswald', sans-serif;
+              font-size: 18px;" href="/admin/logout">Logout</a>
+            </nav>
+          </div>
+        </header>
+        {% block content %}{% endblock %}
+    </body>
+</html>
