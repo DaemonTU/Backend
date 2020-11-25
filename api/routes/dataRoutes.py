@@ -1,4 +1,8 @@
-from flask import request,jsonify,Blueprint, redirect,url_for, flash
+from flask import request,jsonify,Blueprint, redirect,url_for, flash, session
+from os import environ
+from passlib.hash import pbkdf2_sha256
+import jwt
+import datetime
 import requests
 def construct_blueprint(cluster):
     data = Blueprint("data",__name__,url_prefix="/api")
@@ -106,5 +110,39 @@ def construct_blueprint(cluster):
                 output.append(data)
             return jsonify({"status" : 200,"result" : output})
         return jsonify({"status" : 500,"message" : "Internal Server Error"})
+
+    @data.route("/user/login",methods=['POST'])
+    def user_login():
+        if request.method == 'POST':
+            username = request.form["username"]
+            password = request.form["password"]
+            response = cluster.db.users.find_one({"username" : username})
+            if response:
+                if(pbkdf2_sha256.verify(password,response["password"])):
+                    jwt_encoded = jwt.encode({"username" : response["username"], "exp" : datetime.datetime.utcnow()+datetime.timedelta(days=1)},environ.get("SECRET_KEY"))
+                    session["user_token"] = jwt_encoded
+                    return jsonify({"status" : 200,"token" : str(jwt_encoded)})
+                return jsonify({"status" : 200,"message" : "password is incorrect"})
+            return jsonify({"status" : 200,"message" : "user name is not present"})
+        return jsonify({"status" : 403,"message" : "Method is not allowed"})
+    
+    @data.route("/user/add",methods=['POST'])         #CREATE NEW USER
+    def add_user():
+        if request.method == 'POST':
+            username = request.form["username"]
+            upassword = request.form["upassword"]
+            admin = request.form["admin"]
+            apassword = request.form["apassword"]
+            aresponse = cluster.db.admins.find_one({"username" : admin})
+            if aresponse:
+                if(pbkdf2_sha256.verify(apassword,aresponse["password"])):
+                    hashed_pass = pbkdf2_sha256.hash(upassword)
+                    response = cluster.db.users.insert_one({"username" : username, "password" : hashed_pass})
+                    if response:
+                        return jsonify({"status" : 200,"message" : "user added"})
+                    return jsonify({"status" : 500,"message" : "user cannot be added"})
+                return jsonify({"status" : 403,"message" : "admin password incorrect"})
+            return jsonify({"status" : 403,"message" : "admin username incorrect"})
+        return jsonify({"status" : 403,"message" : "Method is not allowed"})
 
     return data
