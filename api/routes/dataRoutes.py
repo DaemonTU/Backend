@@ -15,6 +15,7 @@ def construct_blueprint(cluster):
             for member in response:
                 member_data = {
                     "name" : member["name"],
+                    "rank" : member["rank"],
                     "dept" : member["dept"],
                     "rollno" : member["rollno"],
                     "email" : member["email"],
@@ -37,6 +38,9 @@ def construct_blueprint(cluster):
         github = request.form.get("github")
         linkedin = request.form.get("linkedin")
         avatar = request.form.get("avatar")
+        length = len(name)
+        rank = name[-3:length]
+        name = name[0:-4]
         response = cluster.db.team_members.find_one({"rollno" : rollno})
         if response:
             response = cluster.db.team_members.update_one(
@@ -44,6 +48,7 @@ def construct_blueprint(cluster):
                         { "$set" : 
                             {
                                 "name" : name,
+                                "rank" : rank,
                                 "dept" : dept,
                                 "rollno" : rollno,
                                 "email" : email,
@@ -63,6 +68,7 @@ def construct_blueprint(cluster):
             response = cluster.db.team_members.insert_one(
                     {
                         "name" : name,
+                        "rank" : rank,
                         "dept" : dept,
                         "rollno" : rollno,
                         "email" : email,
