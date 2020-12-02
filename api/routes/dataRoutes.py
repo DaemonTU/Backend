@@ -126,7 +126,6 @@ def construct_blueprint(cluster):
             if response:
                 if(pbkdf2_sha256.verify(password,response["password"])):
                     jwt_encoded = jwt.encode({"username" : response["username"], "exp" : datetime.datetime.utcnow()+datetime.timedelta(days=1)},environ.get("SECRET_KEY"))
-                    session["user_token"] = jwt_encoded
                     return jsonify({"status" : 200,"token" : str(jwt_encoded)})
                 return jsonify({"status" : 200,"message" : "password is incorrect"})
             return jsonify({"status" : 200,"message" : "user name is not present"})
